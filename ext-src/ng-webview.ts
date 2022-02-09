@@ -1,60 +1,66 @@
+import config from './config';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { getNonce, getWebviewOptions } from './extension';
+import  LocalStorageService  from './services/local-storage.service';
 
-export class WebPanel {
-  /**
-   * Track the currently panel. Only allow a single panel to exist at a time.
-   */
-  public static currentPanel: WebPanel | undefined;
-
+export default class WebNgPanel {
+  public static currentPanel: WebNgPanel | undefined;
   private static readonly viewType = 'angular';
-
   private readonly panel: vscode.WebviewPanel;
-  private readonly extensionPath: string;
+  private readonly context?: vscode.ExtensionContext;
   private readonly builtAppFolder: string;
   private disposables: vscode.Disposable[] = [];
+  private configuration: vscode.WorkspaceConfiguration =
+    vscode.workspace.getConfiguration(config.configuration);
+  private storageManager?: LocalStorageService;
 
-  public static createOrShow(extensionPath: string) {
+  public static createOrShow(context: vscode.ExtensionContext) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : undefined;
 
     // If we already have a panel, show it.
-    // Otherwise, create angular panel.
-    if (WebPanel.currentPanel) {
-      WebPanel.currentPanel.panel.reveal(column);
-    } else {
-      WebPanel.currentPanel = new WebPanel(
-        extensionPath,
-        column || vscode.ViewColumn.One
-      );
+    if (WebNgPanel.currentPanel) {
+      WebNgPanel.currentPanel.panel.reveal(column);
+      return;
     }
-    return WebPanel.currentPanel;
-  }
 
-  private constructor(extensionPath: string, column: vscode.ViewColumn) {
-    this.extensionPath = extensionPath;
-    this.builtAppFolder = 'dist';
-
-    // Create and show a new webview panel
-    this.panel = vscode.window.createWebviewPanel(
-      WebPanel.viewType,
-      'My Angular Webview',
-      column,
-      {
-        // Enable javascript in the webview
-        enableScripts: true,
-
-        // And restrict the webview to only loading content from our extension's `media` directory.
-        localResourceRoots: [
-          vscode.Uri.file(path.join(this.extensionPath, this.builtAppFolder)),
-        ],
-      }
+    const panel = vscode.window.createWebviewPanel(
+      WebNgPanel.viewType,
+      config.appTitle,
+      column || vscode.ViewColumn.One,
+      getWebviewOptions(context.extensionUri)
     );
 
+    WebNgPanel.currentPanel = new WebNgPanel(context, panel);
+  }
+
+  private constructor(
+    context: vscode.ExtensionContext,
+    panel: vscode.WebviewPanel
+  ) {
+    this.context = context;
+    this.panel = panel;
+    // sets the angular app path
+    this.builtAppFolder = config.appPath;
+    // initializes te workspace storage
+    this.storageManager = new LocalStorageService(context.workspaceState);
+
     // Set the webview's initial html content
-    this.panel.webview.html = this._getHtmlForWebview();
+    this.update();
+
+    // Update the content based on view changes
+    this.panel.onDidChangeViewState(
+      (e) => {
+        if (this.panel && this.panel.visible) {
+          this.update();
+        }
+      },
+      null,
+      this.disposables
+    );
 
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programatically
@@ -72,29 +78,56 @@ export class WebPanel {
       null,
       this.disposables
     );
+
+    vscode.window.showInformationMessage(`${config.appTitle} Activated`);
   }
 
-  public dispose() {
-    WebPanel.currentPanel = undefined;
+  private update(): void {
+    this.panel.title = config.appTitle;
+    this.panel.webview.html = this.getHtmlForWebview(this.panel.webview);
+  }
 
-    // Clean up our resources
-    this.panel.dispose();
-
-    while (this.disposables.length) {
-      const stack = this.disposables.pop();
-      if (stack) {
-        stack.dispose();
-      }
-    }
+  public static revive(
+    panel: vscode.WebviewPanel,
+    context: vscode.ExtensionContext
+  ) {
+    WebNgPanel.currentPanel = new WebNgPanel(context, panel);
   }
 
   /**
    * Returns html of the start page (index.html)
    */
-  private _getHtmlForWebview() {
+  private getHtmlForWebview(webview: vscode.Webview): string {
     // path to dist folder
-    const appDistPath = path.join(this.extensionPath, 'dist');
+    const appDistPath = path.join(this.context!.extensionPath, config.appPath);
     const appDistPathUri = vscode.Uri.file(appDistPath);
+
+    // Local path to main script run in the webview
+    const scriptUri = vscode.Uri.joinPath(
+      this.context!.extensionUri,
+      config.extMediaFolder,
+      config.extMediaScript
+    ).with({ scheme: 'vscode-resource' });
+
+    // Uri to load styles into webview
+    const styleResetPath = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context!.extensionUri,
+        config.extMediaFolder,
+        'reset.css'
+      )
+    );
+
+    const stylesPathMainPath = webview.asWebviewUri(
+      vscode.Uri.joinPath(
+        this.context!.extensionUri,
+        config.extMediaFolder,
+        'vscode.css'
+      )
+    );
+
+    // Use a nonce to only allow specific scripts to be run
+    const nonce = getNonce();
 
     // path as uri
     const baseUri = this.panel.webview.asWebviewUri(appDistPathUri);
@@ -111,6 +144,21 @@ export class WebPanel {
       `<base href="${String(baseUri)}/">`
     );
 
+    // TODO Instead of returning this, return an iframe with this as content
     return indexHtml;
+  }
+
+  public dispose() {
+    WebNgPanel.currentPanel = undefined;
+
+    // Clean up our resources
+    this.panel.dispose();
+
+    while (this.disposables.length) {
+      const stack = this.disposables.pop();
+      if (stack) {
+        stack.dispose();
+      }
+    }
   }
 }

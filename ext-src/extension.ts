@@ -1,16 +1,51 @@
-import { WebPanel } from './ng-webview';
 import * as vscode from 'vscode';
-/**
- * Manages webview panels
- */
-/**
- * Activates extension
- * @param context vscode extension context
- */
-export function activate(context: vscode.ExtensionContext) {
-  context.subscriptions.push(
-    vscode.commands.registerCommand('ng-webview.start', () => {
-      WebPanel.createOrShow(context.extensionPath);
-    })
-  );
+import config from './config';
+import WebNgPanel from './ng-webview';
+
+const START_COMMAND: string = 'ng-webview.start';
+
+const DEBUG = false;
+const debug = (fn: Function) => {
+  DEBUG && fn();
+};
+
+export const activate = (context: vscode.ExtensionContext): void => {
+  const startCommand = vscode.commands.registerCommand(START_COMMAND, () => {
+    WebNgPanel.createOrShow(context);
+  });
+  context.subscriptions.push(startCommand);
+
+  const statusBarItem = vscode.window.createStatusBarItem();
+  statusBarItem.text = config.appTitle;
+  statusBarItem.command = START_COMMAND;
+  statusBarItem.show();
+  context.subscriptions.push(statusBarItem);
+
+  debug(() => vscode.commands.executeCommand(START_COMMAND));
 }
+
+
+export const getWebviewOptions = (extensionUri: vscode.Uri): vscode.WebviewOptions => {
+  return {
+    // Enable javascript in the webview
+    enableScripts: true,
+
+    // And restrict the webview to only loading content from the extension's `js` directory
+    // and then angular app directory.
+    localResourceRoots: [
+      vscode.Uri.joinPath(extensionUri, config.extMediaFolder),
+      vscode.Uri.joinPath(extensionUri, config.appPath),
+    ],
+  };
+};
+
+
+export const getNonce = (): string => {
+  let text = '';
+  const possible =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < 32; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+};
