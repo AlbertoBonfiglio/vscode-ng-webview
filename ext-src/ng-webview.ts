@@ -94,6 +94,14 @@ export default class WebNgPanel {
     WebNgPanel.currentPanel = new WebNgPanel(context, panel);
   }
 
+  public static sendMessage(context: vscode.ExtensionContext): void {
+    const view = WebNgPanel.currentPanel?.panel?.webview;
+    if (view) {
+      view.postMessage({ type: 'logIn' });
+      view.postMessage({ type: 'logOut' });
+    }
+  };
+
   /**
    * Returns html of the start page (index.html)
    */
@@ -110,7 +118,7 @@ export default class WebNgPanel {
     ).with({ scheme: 'vscode-resource' });
 
     // Uri to load styles into webview
-    const styleResetPath = webview.asWebviewUri(
+    const styleResetUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this.context!.extensionUri,
         config.extMediaFolder,
@@ -118,7 +126,7 @@ export default class WebNgPanel {
       )
     );
 
-    const stylesPathMainPath = webview.asWebviewUri(
+    const stylesCssUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this.context!.extensionUri,
         config.extMediaFolder,
@@ -146,6 +154,34 @@ export default class WebNgPanel {
 
     // TODO Instead of returning this, return an iframe with this as content
     return indexHtml;
+    /*
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <meta http-equiv="Content-Security-Policy"
+            script-src 'nonce-${nonce}';
+            style-src ${webview.cspSource};">
+
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link href="${styleResetUri}" rel="stylesheet">
+          <link href="${stylesCssUri}" rel="stylesheet">
+
+          <title>${config.appTitle}</title>
+        </head>
+
+        <body>
+            <iframe id="appFrame" src="${}" >
+              ${indexHtml}
+            </iframe>
+        </body>
+
+        <script nonce="${nonce}" src="${scriptUri}"></script>
+
+      </html>
+    `;
+  */
   }
 
   public dispose() {

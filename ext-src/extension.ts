@@ -3,6 +3,8 @@ import config from './config';
 import WebNgPanel from './ng-webview';
 
 const START_COMMAND: string = 'ng-webview.start';
+const SEND_MSG_COMMAND: string = 'ng-webview.send-message';
+
 
 const DEBUG = false;
 const debug = (fn: Function) => {
@@ -13,7 +15,12 @@ export const activate = (context: vscode.ExtensionContext): void => {
   const startCommand = vscode.commands.registerCommand(START_COMMAND, () => {
     WebNgPanel.createOrShow(context);
   });
+  const sendMsgCommand = vscode.commands.registerCommand(SEND_MSG_COMMAND, () => {
+    WebNgPanel.sendMessage(context);
+  });
+
   context.subscriptions.push(startCommand);
+  context.subscriptions.push(sendMsgCommand);
 
   const statusBarItem = vscode.window.createStatusBarItem();
   statusBarItem.text = config.appTitle;

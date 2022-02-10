@@ -8,18 +8,16 @@ import { StoreModule } from '@ngrx/store';
 import { reducers, metaReducers } from './reducers';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     StoreModule.forRoot(reducers, {
-      metaReducers
-    })
+      metaReducers,
+    }),
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [{ provide: Window, useValue: window }],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -23,8 +23,13 @@
     "commands": [
       {
         "command": "ng-webview.start",
-        "title": "Open webview",
-        "category": "Angular"
+        "title": "Open",
+        "category": "NgWebView"
+      },
+      {
+        "command": "ng-webview.send-message",
+        "title": "Send Message",
+        "category": "NgWebView"
       }
     ]
   },

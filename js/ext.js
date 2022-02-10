@@ -1,5 +1,4 @@
 (function () {
-  console.log('SOOOCA');
   // @ts-ignore
   const vscode = acquireVsCodeApi();
 
@@ -13,11 +12,5 @@
           document.querySelector('iframe').contentWindow.postMessage(event.data, '*');
       }
   });
-
-  const items = document.getElementById('app');
-    //'item UserPopup_menuItem__yaw_D');
-
-  console.log('found  --> ', items?.ATTRIBUTE_NODE);
-
-
+  
 }());
