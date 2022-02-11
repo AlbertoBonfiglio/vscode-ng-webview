@@ -1,3 +1,6 @@
 export const environment = {
-  production: true
+  appName: 'ng-webview',
+  envName: 'DEV',
+  production: true,
+  i18nPrefix: ''
 };

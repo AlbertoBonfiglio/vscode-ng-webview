@@ -1,6 +1,9 @@
 import { AfterViewChecked, Component } from '@angular/core';
-import { filter } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'src/app/core/core.state';
 import { VsCodeListenerService } from 'src/app/services/vs-code-listener/vs-code-listener.service';
+import { environment } from 'src/environments/environment';
+
 
 @Component({
   selector: 'app-root',
@@ -8,16 +11,17 @@ import { VsCodeListenerService } from 'src/app/services/vs-code-listener/vs-code
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements AfterViewChecked {
-  public title = 'vscode-ng-webview';
+  public title = environment.appName;
 
-  constructor(private vsCode: VsCodeListenerService) {
+  constructor(
+    private store: Store<AppState>,
+    private vsCode: VsCodeListenerService
+  ) {
     this.sunscribeToVsCodeEvents();
   }
 
   private sunscribeToVsCodeEvents(): void {
-    this.vsCode.onMessage$
-    .pipe()
-    .subscribe((event: any) => {
+    this.vsCode.onMessage$.pipe().subscribe((event: any) => {
       var msg: any = {};
       switch (event.data.type) {
         case 'logIn':
@@ -40,7 +44,6 @@ export class AppComponent implements AfterViewChecked {
           break;
       }
       this.vsCode.postMessage(msg);
-
     });
   }
 
