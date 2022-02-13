@@ -120,33 +120,6 @@ export default class WebNgPanel {
     const appDistPath = path.join(this.context!.extensionPath, config.appPath);
     const appDistPathUri = vscode.Uri.file(appDistPath);
 
-    // Local path to main script run in the webview
-    const scriptUri = vscode.Uri.joinPath(
-      this.context!.extensionUri,
-      config.extMediaFolder,
-      config.extMediaScript
-    ).with({ scheme: 'vscode-resource' });
-
-    // Uri to load styles into webview
-    const styleResetUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.context!.extensionUri,
-        config.extMediaFolder,
-        'reset.css'
-      )
-    );
-
-    const stylesCssUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this.context!.extensionUri,
-        config.extMediaFolder,
-        'vscode.css'
-      )
-    );
-
-    // Use a nonce to only allow specific scripts to be run
-    const nonce = getNonce();
-
     // path as uri
     const baseUri = this.panel.webview.asWebviewUri(appDistPathUri);
 
@@ -162,36 +135,8 @@ export default class WebNgPanel {
       `<base href="${String(baseUri)}/">`
     );
 
-    // TODO Instead of returning this, return an iframe with this as content
     return indexHtml;
-    /*
-    return `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <meta http-equiv="Content-Security-Policy"
-            script-src 'nonce-${nonce}';
-            style-src ${webview.cspSource};">
 
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <link href="${styleResetUri}" rel="stylesheet">
-          <link href="${stylesCssUri}" rel="stylesheet">
-
-          <title>${config.appTitle}</title>
-        </head>
-
-        <body>
-            <iframe id="appFrame" src="${}" >
-              ${indexHtml}
-            </iframe>
-        </body>
-
-        <script nonce="${nonce}" src="${scriptUri}"></script>
-
-      </html>
-    `;
-  */
   }
 
   public dispose() {
