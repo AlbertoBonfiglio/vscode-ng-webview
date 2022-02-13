@@ -1,4 +1,4 @@
-import { createSlice } from 'ngrx-slice';
+import { createSlice, PayloadAction } from 'ngrx-slice';
 import { SettingsState, NIGHT_MODE_THEME } from 'src/app/core/settings/settings.model';
 
 export const initialState: SettingsState = {
@@ -21,7 +21,8 @@ export const {
   name: 'settings',
   initialState,
   reducers: {
-    changeLanguage: (state, action) => {
+    changeLanguage: (state, action: PayloadAction<{payload: string}> ) => {
+      console.log('[reducer]: ', action);
       state.language = action.payload;
     },
   },

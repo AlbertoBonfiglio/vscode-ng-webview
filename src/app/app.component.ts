@@ -20,7 +20,7 @@ export class AppComponent{
   }
 
   buttonClick(): void {
-    this.store.dispatch(SettingsActions.changeLanguage('de'));
+    this.store.dispatch(SettingsActions.changeLanguage({payload: 'de'}));
   }
 
 }

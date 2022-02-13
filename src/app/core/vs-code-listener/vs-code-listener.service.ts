@@ -52,13 +52,13 @@ export class VsCodeListenerService implements OnDestroy {
           console.log('[NG APP] accepted a message', msg);
           switch (msg.type.toLowerCase()) {
             case 'test':
-              this.store.dispatch(SettingsActions.changeLanguage(msg.payload));
+              this.store.dispatch(SettingsActions.changeLanguage({payload: msg.payload}));
               break;
 
             default:
               // unknown message
               this.postMessage({
-                command: 'alert',
+                command: 'warn',
                 text: `🐛 got an unknown message`,
               });
               break;

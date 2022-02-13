@@ -1,6 +1,6 @@
 (function () {
   // @ts-ignore
-  const vscode = acquireVsCodeApi();
+  //const vscode = acquireVsCodeApi();
 
   window.addEventListener('message', (event) => {
     console.log(event);
@@ -12,5 +12,5 @@
           document.querySelector('iframe').contentWindow.postMessage(event.data, '*');
       }
   });
-  
+
 }());

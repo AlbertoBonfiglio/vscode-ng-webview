@@ -73,7 +73,16 @@ export default class WebNgPanel {
         switch (message.command) {
           case 'alert':
             vscode.window.showErrorMessage(message.text);
-            return;
+            break;
+          case 'info':
+            vscode.window.showInformationMessage(message.text);
+            break;
+          case 'warn':
+            vscode.window.showWarningMessage(message.text);
+            break;
+          default:
+            console.log('[WebNgPanel] unknown command.', message);
+            break;
         }
       },
       null,

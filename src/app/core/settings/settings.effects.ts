@@ -13,7 +13,7 @@ export class SettingsEffects {
         // Listen for multiplyBy.trigger
         ofType(SettingsActions.changeLanguage),
         // switchMap to a side-effect (timer)
-        tap((value) => console.log(`Selected Language: ${value}`)),
+        tap((value) => console.log(`Selected Language: ${value}`, value)),
         tap((value) =>
           this.vsCode.postMessage({
             type: 'alert',
