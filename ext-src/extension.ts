@@ -1,9 +1,11 @@
+import { IVsCodeMessage } from './interfaces';
 import * as vscode from 'vscode';
 import config from './config';
 import WebNgPanel from './ng-webview';
 
 const START_COMMAND: string = 'ng-webview.start';
 const SEND_MSG_COMMAND: string = 'ng-webview.send-message';
+const SEND_TEST_COMMAND: string = 'ng-webview.send-message-test';
 
 
 const DEBUG = false;
@@ -16,11 +18,23 @@ export const activate = (context: vscode.ExtensionContext): void => {
     WebNgPanel.createOrShow(context);
   });
   const sendMsgCommand = vscode.commands.registerCommand(SEND_MSG_COMMAND, () => {
-    WebNgPanel.sendMessage(context);
+    WebNgPanel.sendMessage({
+      type: 'message',
+      payload: 'test message',
+      source: config.appTitle,
+    } as IVsCodeMessage);
+  });
+  const sendTestMsgCommand = vscode.commands.registerCommand(SEND_TEST_COMMAND, () => {
+    WebNgPanel.sendMessage({
+      type: 'test',
+      payload: 'en',
+      source: config.appTitle,
+    } as IVsCodeMessage);
   });
 
   context.subscriptions.push(startCommand);
   context.subscriptions.push(sendMsgCommand);
+  context.subscriptions.push(sendTestMsgCommand);
 
   const statusBarItem = vscode.window.createStatusBarItem();
   statusBarItem.text = config.appTitle;

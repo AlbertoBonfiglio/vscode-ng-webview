@@ -19,7 +19,7 @@
     {
       "name": "Launch Extension",
       "type": "extensionHost",
-      "preLaunchTask": "npm: build",
+      "preLaunchTask": "npm: build-dev",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [

@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { getNonce, getWebviewOptions } from './extension';
 import  LocalStorageService  from './services/local-storage.service';
+import { IVsCodeMessage } from './interfaces';
 
 export default class WebNgPanel {
   public static currentPanel: WebNgPanel | undefined;
@@ -94,11 +95,11 @@ export default class WebNgPanel {
     WebNgPanel.currentPanel = new WebNgPanel(context, panel);
   }
 
-  public static sendMessage(context: vscode.ExtensionContext): void {
+  public static sendMessage(payload: IVsCodeMessage): void {
     const view = WebNgPanel.currentPanel?.panel?.webview;
     if (view) {
-      view.postMessage({ type: 'logIn' });
-      view.postMessage({ type: 'logOut' });
+      console.log('[WebNgPanel] sending message to app.', payload);
+      view.postMessage(payload);
     }
   };
 

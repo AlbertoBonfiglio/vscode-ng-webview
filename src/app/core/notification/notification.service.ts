@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { VsCodeListenerService } from 'src/app/services/vs-code-listener/vs-code-listener.service';
+import { VsCodeListenerService } from 'src/app/core/vs-code-listener/vs-code-listener.service';
 
 @Injectable({
   providedIn: 'root',
