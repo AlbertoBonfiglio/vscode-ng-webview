@@ -8,10 +8,6 @@ import { SettingsActions } from 'src/app/core/settings/settings.slice';
 import { environment } from 'src/environments/environment';
 
 const VSCODEAPI_NOT_FOUND = 'vsCodeApi not found on window object. Did you create the script in index.html?';
-const VSCODE_MESSAGE_ACTION_LIST = [
-  'test',
-  'tette'
-];
 
 @Injectable({
   providedIn: 'root',
@@ -40,19 +36,20 @@ export class VsCodeListenerService implements OnDestroy {
   private initializeObservableStream(): void {
     this.onMessage$
       .pipe(
-        map(event => (event as any).data as IVsCodeMessage),
+        map((event) => (event as any).data as IVsCodeMessage),
         tap((msg) =>
           console.log('[NG APP] received a message  to be filtered', msg)
         ),
-        filter((msg: IVsCodeMessage) => (msg)
-         ? msg.source === config.appTitle
-         : false
-         ),
+        filter((msg: IVsCodeMessage) =>
+          msg ? msg.source === config.appTitle : false
+        ),
         tap((msg: IVsCodeMessage) => {
           console.log('[NG APP] accepted a message', msg);
           switch (msg.type.toLowerCase()) {
             case 'test':
-              this.store.dispatch(SettingsActions.changeLanguage({payload: msg.payload}));
+              this.store.dispatch(
+                SettingsActions.changeLanguage({ payload: msg.payload })
+              );
               break;
 
             default:
@@ -63,17 +60,13 @@ export class VsCodeListenerService implements OnDestroy {
               });
               break;
           }
-        }),
+        })
       )
       .subscribe((msg: IVsCodeMessage) => {
         console.log('[NG APP] processed a message', msg);
       });
-   }
-
-  public init(): Promise<void> {
-    return new Promise<void>((resolve, reject) => resolve());
   }
-
+  
   private createOnMessageObservable(renderer: Renderer2) {
     let removeOnMessageEventListener: () => void;
     const createOnMessageEventListener = (
@@ -92,11 +85,15 @@ export class VsCodeListenerService implements OnDestroy {
     ).pipe(takeUntil(this._destroy$));
   }
 
+  public init(): Promise<void> {
+    return new Promise<void>((resolve, reject) => resolve());
+  }
+
   public postMessage(payload: {}): void {
     if (this.windowRef.vsCodeApi) {
       this.windowRef.vsCodeApi.postMessage(payload);
     } else {
-      console.log('[NG APP] Attempting to send message to vsCode.', payload)
+      console.log('[NG APP] Attempting to send message to vsCode.', payload);
     }
   }
 

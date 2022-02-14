@@ -8,11 +8,24 @@ export class NotificationService {
   constructor(private vsCodeApi: VsCodeListenerService) {}
 
   // todo add info, error, success, and default
-  public warn(msg: string) {
+  public warn(msg: string): void {
     this.vsCodeApi.postMessage({
       command: 'alert',
-      text: msg
+      text: msg,
     });
   }
 
+  public alert(msg: string): void {
+    this.vsCodeApi.postMessage({
+      command: 'warn',
+      text: msg,
+    });
+  }
+
+  public info(msg: string): void {
+    this.vsCodeApi.postMessage({
+      command: 'info',
+      text: msg,
+    });
+  }
 }

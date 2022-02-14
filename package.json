@@ -10,7 +10,6 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --output-hashing none && tsc -p tsconfig.extension.json",
-    "dfsdfsprebuild-dev": "npm run redux-devtools",
     "build-dev": "ng build --output-hashing none && tsc -p tsconfig.extension.json",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
