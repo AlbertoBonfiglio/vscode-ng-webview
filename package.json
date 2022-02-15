@@ -6,6 +6,7 @@
   "engines": {
     "vscode": "^1.52.0"
   },
+
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -19,7 +20,9 @@
     "redux-devtools": "redux-devtools --hostname=localhost --port=8765",
     "vscode:prepublish": "npm run build && tsc -p tsconfig.extension.json"
   },
+
   "private": false,
+
   "main": "./dist/ext-src/extension.js",
   "contributes": {
     "commands": [
@@ -38,11 +41,64 @@
         "title": "Send Test Message",
         "category": "NgWebView"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "ng-webview",
+      "properties": {
+        "ng-webview.theme": {
+          "type": "string",
+          "default": "default",
+          "description": "The selected theme for the UI."
+        },
+        "ng-webview.language": {
+          "type": "string",
+          "default": "en",
+          "description": "The selected language for the UI."
+        },
+        "ng-webview.nightTheme": {
+          "type": "string",
+          "default": "default",
+          "description": "The selected night theme for the UI."
+        },
+        "ng-webview.autoNightMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically switch to the night theme."
+        },
+        "ng-webview.stickyHeader": {
+          "type": "boolean",
+          "default": false,
+          "description": "Make the app header sticky."
+        },
+        "ng-webview.pageAnimations": {
+          "type": "boolean",
+          "default": false,
+          "description": "The selected language for the UI."
+        },
+        "ng-webview.pageAnimationsDisabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "The selected language for the UI."
+        },
+        "ng-webview.elementsAnimations": {
+          "type": "boolean",
+          "default": false,
+          "description": "The selected language for the UI."
+        },
+        "ng-webview.hour": {
+          "type": "number",
+          "default": 17,
+          "description": "The selected language for the UI."
+        }
+
+      }
+    }
   },
+
   "activationEvents": [
     "onCommand:ng-webview.start"
   ],
+
   "dependencies": {
     "@angular/animations": "^13.2.2",
     "@angular/cdk": "^13.2.2",
@@ -65,10 +121,11 @@
     "@types/vscode": "^1.64.0",
     "bootstrap": "^5.1.3",
     "ngrx-slice": "^6.1.0",
-    "rxjs": "^7.5.3",
+    "rxjs": "^7.5.4",
     "tslib": "^2.3.1",
     "zone.js": "~0.11.4"
   },
+
   "devDependencies": {
     "@angular-devkit/build-angular": "~13.2.3",
     "@angular/cli": "^13.2.3",
@@ -87,6 +144,7 @@
     "typescript": "^4.5.5",
     "vsce": "^2.6.7"
   },
+
   "repository": {
     "type": "git",
     "url": "https://github.com/AlbertoBonfiglio/vscode-ng-webview.git"

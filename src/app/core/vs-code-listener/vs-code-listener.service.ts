@@ -37,27 +37,25 @@ export class VsCodeListenerService implements OnDestroy {
     this.onMessage$
       .pipe(
         map((event) => (event as any).data as IVsCodeMessage),
-        tap((msg) =>
-          console.log('[NG APP] received a message  to be filtered', msg)
-        ),
         filter((msg: IVsCodeMessage) =>
           msg ? msg.source === config.appTitle : false
         ),
         tap((msg: IVsCodeMessage) => {
-          console.log('[NG APP] accepted a message', msg);
-          switch (msg.type.toLowerCase()) {
-            case 'test':
+          switch (msg.type) {
+            case 'loadSettings':
               this.store.dispatch(
-                SettingsActions.changeLanguage({ payload: msg.payload })
+                SettingsActions
+                .loadStateFromVsCodeSuccess({ payload: msg.payload })
               );
               break;
 
             default:
               // unknown message
-              this.postMessage({
-                command: 'warn',
-                text: `🐛 got an unknown message`,
-              });
+              const unknownMessageWarning = {
+                type: 'warn',
+                payload: `🐛 got an unknown message`,
+              } as IVsCodeMessage;
+              this.postMessage(unknownMessageWarning);
               break;
           }
         })
@@ -66,7 +64,7 @@ export class VsCodeListenerService implements OnDestroy {
         console.log('[NG APP] processed a message', msg);
       });
   }
-  
+
   private createOnMessageObservable(renderer: Renderer2) {
     let removeOnMessageEventListener: () => void;
     const createOnMessageEventListener = (
@@ -89,7 +87,7 @@ export class VsCodeListenerService implements OnDestroy {
     return new Promise<void>((resolve, reject) => resolve());
   }
 
-  public postMessage(payload: {}): void {
+  public postMessage(payload: IVsCodeMessage): void {
     if (this.windowRef.vsCodeApi) {
       this.windowRef.vsCodeApi.postMessage(payload);
     } else {

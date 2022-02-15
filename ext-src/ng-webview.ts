@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { getNonce, getWebviewOptions } from './extension';
 import  LocalStorageService  from './services/local-storage.service';
-import { IVsCodeMessage } from './interfaces';
+import { IVsCodeMessage, IVSCodeSettings } from './interfaces';
 
 export default class WebNgPanel {
   public static currentPanel: WebNgPanel | undefined;
@@ -69,16 +69,29 @@ export default class WebNgPanel {
 
     // Handle messages from the webview
     this.panel.webview.onDidReceiveMessage(
-      (message: any) => {
-        switch (message.command) {
+      (message: IVsCodeMessage) => {
+        console.log(
+          '[WebNgPanel] received command:',
+          message.type,
+          message.payload
+        );
+        switch (message.type.toLowerCase()) {
           case 'alert':
-            vscode.window.showErrorMessage(message.text);
+            vscode.window.showErrorMessage(message.payload);
             break;
           case 'info':
-            vscode.window.showInformationMessage(message.text);
+            vscode.window.showInformationMessage(message.payload);
             break;
           case 'warn':
-            vscode.window.showWarningMessage(message.text);
+            vscode.window.showWarningMessage(message.payload);
+            break;
+          case 'loadsettings':
+            const settingsMessage = {
+              type: 'loadSettings',
+              payload: this.configuration,
+              source: config.appTitle,
+              } as IVsCodeMessage;
+            WebNgPanel.sendMessage(settingsMessage);
             break;
           default:
             console.log('[WebNgPanel] unknown command.', message);
@@ -90,6 +103,7 @@ export default class WebNgPanel {
     );
 
     vscode.window.showInformationMessage(`${config.appTitle} Activated`);
+    console.log("[Config] :", this.configuration as unknown as IVSCodeSettings );
   }
 
   private update(): void {

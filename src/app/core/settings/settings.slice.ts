@@ -1,3 +1,4 @@
+import { IVSCodeSettings } from 'ext-src/interfaces';
 import { createSlice, PayloadAction } from 'ngrx-slice';
 import { SettingsState, NIGHT_MODE_THEME } from 'src/app/core/settings/settings.model';
 
@@ -21,8 +22,14 @@ export const {
   name: 'settings',
   initialState,
   reducers: {
+    loadStateFromVsCode: (state) => {},
+    loadStateFromVsCodeSuccess: (state, action: PayloadAction<{payload: IVSCodeSettings}> ) => {
+      console.log('[reducer loadStateFromVsCodeSuccess]: ', action, state);
+      state = action. payload;
+      console.log('[reducer loadStateFromVsCodeSuccess]: ', action, state);
+
+    },
     changeLanguage: (state, action: PayloadAction<{payload: string}> ) => {
-      console.log('[reducer]: ', action);
       state.language = action.payload;
     },
   },
