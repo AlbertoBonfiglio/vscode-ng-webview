@@ -52,6 +52,7 @@ export class SettingsEffects {
             type: 'info',
             payload: `Selected Language: ${value}`,
           } as IVsCodeMessage;
+          console.log('value', value);
           this.vsCode.postMessage(message);
         })
       ),

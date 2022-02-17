@@ -11,7 +11,6 @@ export default class WebNgPanel {
   private static readonly viewType = 'angular';
   private readonly panel: vscode.WebviewPanel;
   private readonly context?: vscode.ExtensionContext;
-  private readonly builtAppFolder: string;
   private disposables: vscode.Disposable[] = [];
   private configuration: vscode.WorkspaceConfiguration =
     vscode.workspace.getConfiguration(config.configuration);
@@ -44,9 +43,7 @@ export default class WebNgPanel {
   ) {
     this.context = context;
     this.panel = panel;
-    // sets the angular app path
-    this.builtAppFolder = config.appPath;
-    // initializes te workspace storage
+    // initializes te workspace storage (not used yet)
     this.storageManager = new LocalStorageService(context.workspaceState);
 
     // Set the webview's initial html content
@@ -63,11 +60,21 @@ export default class WebNgPanel {
       this.disposables
     );
 
+    // Handle messages from the webview
+    this.handleOnDidReceiveMessage();
+
+    // handles conviguration change events
+    this.handleOnDidChangeConfiguration();
+
     // Listen for when the panel is disposed
     // This happens when the user closes the panel or when the panel is closed programatically
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
-    // Handle messages from the webview
+    vscode.window.showInformationMessage(`${config.appTitle} Activated`);
+    console.log('[Config] :', this.configuration as unknown as IVSCodeSettings);
+  }
+
+  private handleOnDidReceiveMessage(): void {
     this.panel.webview.onDidReceiveMessage(
       (message: IVsCodeMessage) => {
         console.log(
@@ -90,9 +97,18 @@ export default class WebNgPanel {
               type: 'loadSettings',
               payload: this.configuration,
               source: config.appTitle,
-              } as IVsCodeMessage;
+            } as IVsCodeMessage;
             WebNgPanel.sendMessage(settingsMessage);
             break;
+
+          case 'changesetting':
+            //TODO verify this doesn't cause a loop
+            this.configuration.update(
+              message.payload.setting,
+              message.payload.value
+            );
+            break;
+
           default:
             console.log('[WebNgPanel] unknown command.', message);
             break;
@@ -101,14 +117,34 @@ export default class WebNgPanel {
       null,
       this.disposables
     );
+  }
 
-    vscode.window.showInformationMessage(`${config.appTitle} Activated`);
-    console.log("[Config] :", this.configuration as unknown as IVSCodeSettings );
+  private handleOnDidChangeConfiguration(): void {
+    vscode.workspace.onDidChangeConfiguration(
+      (event: vscode.ConfigurationChangeEvent) => {
+        // refresh the configuration object
+        this.configuration = vscode.workspace.getConfiguration(
+          config.configuration
+        );
+
+        //TODO find out if changes triggered by the ng app cause this to fire
+        for (let [key, value] of Object.entries(this.configuration)) {
+          if (event.affectsConfiguration(`${config.configuration}.${key}`)) {
+            WebNgPanel.sendMessage({
+              type: 'configchange',
+              payload: { key, value },
+              source: config.appTitle,
+            } as IVsCodeMessage);
+            break;
+          }
+        }
+      }
+    );
   }
 
   private update(): void {
     this.panel.title = config.appTitle;
-    this.panel.webview.html = this.getHtmlForWebview(this.panel.webview);
+    this.panel.webview.html = this.getHtmlForWebview();
   }
 
   public static revive(
@@ -124,12 +160,10 @@ export default class WebNgPanel {
       console.log('[WebNgPanel] sending message to app.', payload);
       view.postMessage(payload);
     }
-  };
+  }
 
-  /**
-   * Returns html of the start page (index.html)
-   */
-  private getHtmlForWebview(webview: vscode.Webview): string {
+  // Returns the html vontent for the webview (the ng app)
+  private getHtmlForWebview(): string {
     // path to dist folder
     const appDistPath = path.join(this.context!.extensionPath, config.appPath);
     const appDistPathUri = vscode.Uri.file(appDistPath);
@@ -150,7 +184,6 @@ export default class WebNgPanel {
     );
 
     return indexHtml;
-
   }
 
   public dispose() {
