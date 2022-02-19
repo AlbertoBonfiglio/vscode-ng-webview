@@ -43,7 +43,7 @@ if (
   let remoteDevToolsProxy = new RemoteDevToolsProxy({
     connectTimeout: 300000, // extend for pauses during debugging
     ackTimeout: 120000, // extend for pauses during debugging
-    secure: false, // dev only
+    secure: environment.useSecureRemotedev, // dev only
     instanceId: `${environment.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
   });
 

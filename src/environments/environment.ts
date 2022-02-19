@@ -8,6 +8,7 @@ export const environment = {
   useRemotedev: true,
   remotedevAddress: 'localhost',
   remotedevPort: '8765',
+  useSecureRemotedev: false,
   production: false,
   i18nPrefix: '',
 };

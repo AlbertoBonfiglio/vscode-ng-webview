@@ -20,7 +20,7 @@ export class RemoteDevToolsProxy implements ReduxDevtoolsExtension {
     autoReconnect: true,
     connectTimeout: 20000,
     ackTimeout: 10000,
-    secure: false,
+    secure: environment.useSecureRemotedev,
     instanceId: `${environment.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
   };
 
