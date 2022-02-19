@@ -3,6 +3,7 @@
   "description": "Starter template for your next VSCode extension based on Angular",
   "version": "0.0.0",
   "publisher": "Bonfisoft",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.52.0"
   },
