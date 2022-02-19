@@ -3,10 +3,13 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  appName : 'ng-webview',
-  envName : 'DEV',
+  appName: 'ng-webview',
+  envName: 'DEV',
+  useRemotedev: true,
+  remotedevAddress: 'localhost',
+  remotedevPort: '8765',
   production: false,
-  i18nPrefix: ''
+  i18nPrefix: '',
 };
 
 /*

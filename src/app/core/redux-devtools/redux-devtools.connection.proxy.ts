@@ -4,11 +4,12 @@ export class RemoteDevToolsConnectionProxy
   implements ReduxDevtoolsExtensionConnection
 {
   constructor(public remotedev: any, public instanceId: string) {}
+
   init(state?: any): void {
-    throw new Error('Method not implemented.');
+    //throw new Error('Method not implemented.');
   }
   error(anyErr: any): void {
-    throw new Error('Method not implemented.');
+    //throw new Error('Method not implemented.');
   }
 
   subscribe(listener: (change: any) => void): any {
@@ -29,5 +30,7 @@ export class RemoteDevToolsConnectionProxy
 
   send(action: any, state: any): any {
     // Never called
+    this.remotedev.send(action, state);
+    console.log('connproxy called send', action, state);
   }
 }

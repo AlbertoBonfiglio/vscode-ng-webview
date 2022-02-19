@@ -4,37 +4,42 @@ import {
   ReduxDevtoolsExtensionConnection,
 } from '@ngrx/store-devtools/src/extension';
 import { RemoteDevToolsConnectionProxy } from 'src/app/core/redux-devtools/redux-devtools.connection.proxy';
-import  {connect as connetToRemote}  from 'remotedev';
+import  {connect as connectToRemote}  from 'remotedev';
+import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
-
+@Injectable()
 export class RemoteDevToolsProxy implements ReduxDevtoolsExtension {
   remotedev: any = null;
   defaultOptions = {
     realtime: true,
     // Needs to match what you run `remotedev` command with and
     // what you setup in remote devtools local connection settings
-    hostname: 'localhost',
-    port: 8765,
+    hostname: environment.remotedevAddress,
+    port: environment.remotedevPort,
     autoReconnect: true,
     connectTimeout: 20000,
     ackTimeout: 10000,
-    secure: true,
-    instanceId: 'MYAPP-REDUX-DEV-TOOLS',
+    secure: false,
+    instanceId: `${environment.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
   };
 
-  constructor(defaultOptions: Object) {
-    this.defaultOptions = Object.assign(this.defaultOptions, defaultOptions);
+  constructor(options: Object) {
+    this.defaultOptions = { ...this.defaultOptions, ...options };
   }
 
   connect(options: ReduxDevtoolsExtensionConfig): ReduxDevtoolsExtensionConnection {
-    const connectOptions = Object.assign(this.defaultOptions, options);
+    const connectOptions ={...this.defaultOptions, ...options};
 
-    this.remotedev = connetToRemote(connectOptions);
+    this.remotedev = connectToRemote(connectOptions);
 
     const connectionProxy = new RemoteDevToolsConnectionProxy(
       this.remotedev,
       connectOptions.instanceId
     );
+    console.log(`[NG APP] Connected to remotedev
+      ${environment.remotedevAddress}:${environment.remotedevPort}
+      with instanceId: ${connectOptions.instanceId}`);
     return connectionProxy;
   }
 

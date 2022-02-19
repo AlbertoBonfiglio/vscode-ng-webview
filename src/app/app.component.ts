@@ -13,9 +13,8 @@ import { environment } from 'src/environments/environment';
 export class AppComponent{
   public title = environment.appName;
 
-  constructor(
-    private store: Store<AppState>,
-  ) {
+  constructor(protected store: Store<AppState>) {
+    console.clear;
   }
 
   buttonClick(): void {

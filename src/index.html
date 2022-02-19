@@ -16,7 +16,11 @@
   -->
   <script>
     // initializes the vscode api for the messaging functionality
-    window.vsCodeApi = acquireVsCodeApi();
+    try {
+      window.vsCodeApi = acquireVsCodeApi();
+    } catch (e) {
+      console.log('[NG APP] Unable to aquire VSCode API. Are you running in a browser?');
+    }
   </script>
 
 </head>
