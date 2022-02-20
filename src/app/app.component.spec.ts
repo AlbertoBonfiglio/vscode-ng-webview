@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { environment } from 'src/environments/environment';
 import { AppComponent } from './app.component';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { environment } from 'environments/environment';
 
 
 describe('AppComponent', () => {

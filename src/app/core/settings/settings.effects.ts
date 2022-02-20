@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import { createEffect, ofType, Actions } from "@ngrx/effects";
-import { Store } from "@ngrx/store";
-import { IVsCodeMessage } from "ext-src/interfaces";
+import { IVsCodeMessage, SETTINGS_CHANGE } from "ext-src/interfaces";
 import { tap, combineLatest } from "rxjs";
 import { SettingsActions } from "src/app/core/core.module";
 import { VsCodeListenerService } from "src/app/core/vs-code-listener/vs-code-listener.service";
@@ -49,8 +48,8 @@ export class SettingsEffects {
         ofType(SettingsActions.changeLanguage),
         tap((value) =>{
           const message = {
-            type: 'info',
-            payload: `Selected Language: ${value}`,
+            type: SETTINGS_CHANGE,
+            payload: value,
           } as IVsCodeMessage;
           console.log('value', value);
           this.vsCode.postMessage(message);

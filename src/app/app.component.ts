@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { environment } from 'environments/environment';
 import { SettingsActions } from 'src/app/core/core.module';
 import { AppState } from 'src/app/core/core.state';
-import { environment } from 'src/environments/environment';
 
 
 @Component({

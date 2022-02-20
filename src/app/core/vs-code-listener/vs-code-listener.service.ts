@@ -1,11 +1,10 @@
 import { Injectable, OnDestroy, Renderer2, RendererFactory2 } from '@angular/core';
 import { Store } from '@ngrx/store';
-import config from 'ext-src/config';
-import { IVsCodeMessage } from 'ext-src/interfaces';
 import { Subject, Observable, fromEventPattern, takeUntil, filter, tap, map } from 'rxjs';
+import { environment as env } from 'environments/environment';
+import { IVsCodeMessage, SETTINGS_LOAD } from 'ext-src/interfaces';
+import { SettingsActions } from 'src/app/core/core.module';
 import { AppState } from 'src/app/core/core.state';
-import { SettingsActions } from 'src/app/core/settings/settings.slice';
-import { environment } from 'src/environments/environment';
 
 const VSCODEAPI_NOT_FOUND = 'vsCodeApi not found on window object. Did you create the script in index.html?';
 
@@ -23,7 +22,7 @@ export class VsCodeListenerService implements OnDestroy {
     private store: Store<AppState>
   ) {
     this.windowRef = this.window; // so that we don't have to constantly cast it to any
-    if (!environment.production && !this.windowRef.vsCodeApi) {
+    if (!env.production && !this.windowRef.vsCodeApi) {
       console.error(VSCODEAPI_NOT_FOUND);
       // throw new Error(VSCODEAPI_NOT_FOUND);
     }
@@ -37,15 +36,17 @@ export class VsCodeListenerService implements OnDestroy {
     this.onMessage$
       .pipe(
         map((event) => (event as any).data as IVsCodeMessage),
+        // only react to incoming messages from the vs code extension
         filter((msg: IVsCodeMessage) =>
-          msg ? msg.source === config.appTitle : false
+          msg ? msg.source === `VSC-${env.appTitle}` : false
         ),
         tap((msg: IVsCodeMessage) => {
           switch (msg.type) {
-            case 'loadSettings':
+            case SETTINGS_LOAD:
               this.store.dispatch(
-                SettingsActions
-                .loadStateFromVsCodeSuccess({ payload: msg.payload })
+                SettingsActions.loadStateFromVsCodeSuccess({
+                  payload: msg.payload,
+                })
               );
               break;
 
@@ -89,6 +90,7 @@ export class VsCodeListenerService implements OnDestroy {
 
   public postMessage(payload: IVsCodeMessage): void {
     if (this.windowRef.vsCodeApi) {
+      payload.source = `NG-${env.appName}`;
       this.windowRef.vsCodeApi.postMessage(payload);
     } else {
       console.log('[NG APP] Attempting to send message to vsCode.', payload);

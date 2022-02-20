@@ -1,7 +1,7 @@
 import { IVsCodeMessage } from './interfaces';
 import * as vscode from 'vscode';
-import config from './config';
 import WebNgPanel from './ng-webview';
+import { environment as env } from './../environments/environment';
 
 const START_COMMAND: string = 'ng-webview.start';
 const SEND_MSG_COMMAND: string = 'ng-webview.send-message';
@@ -20,15 +20,13 @@ export const activate = (context: vscode.ExtensionContext): void => {
   const sendMsgCommand = vscode.commands.registerCommand(SEND_MSG_COMMAND, () => {
     WebNgPanel.sendMessage({
       type: 'message',
-      payload: 'test message',
-      source: config.appTitle,
+      payload: 'test message'
     } as IVsCodeMessage);
   });
   const sendTestMsgCommand = vscode.commands.registerCommand(SEND_TEST_COMMAND, () => {
     WebNgPanel.sendMessage({
       type: 'test',
       payload: 'en',
-      source: config.appTitle,
     } as IVsCodeMessage);
   });
 
@@ -37,7 +35,7 @@ export const activate = (context: vscode.ExtensionContext): void => {
   context.subscriptions.push(sendTestMsgCommand);
 
   const statusBarItem = vscode.window.createStatusBarItem();
-  statusBarItem.text = config.appTitle;
+  statusBarItem.text = env.appTitle;
   statusBarItem.command = START_COMMAND;
   statusBarItem.show();
   context.subscriptions.push(statusBarItem);
@@ -54,8 +52,8 @@ export const getWebviewOptions = (extensionUri: vscode.Uri): vscode.WebviewOptio
     // And restrict the webview to only loading content from the extension's `js` directory
     // and then angular app directory.
     localResourceRoots: [
-      vscode.Uri.joinPath(extensionUri, config.extMediaFolder),
-      vscode.Uri.joinPath(extensionUri, config.appPath),
+      vscode.Uri.joinPath(extensionUri, env.extension.extMediaFolder),
+      vscode.Uri.joinPath(extensionUri, env.extension.appPath),
     ],
   };
 };

@@ -1,11 +1,14 @@
-export interface IVsCodeMessage {
+const SETTINGS_CHANGE = 'settingchange';
+const SETTINGS_LOAD = 'loadsettings';
+
+interface IVsCodeMessage {
   type: string;
   action: string;
   payload: any;
   source: string;
 }
 
-export interface IVSCodeSettings {
+interface IVSCodeSettings {
   theme: string;
   language: string;
   nightTheme: string;
@@ -16,3 +19,5 @@ export interface IVSCodeSettings {
   elementsAnimations: boolean;
   hour: number;
 }
+
+export {IVSCodeSettings, IVsCodeMessage, SETTINGS_CHANGE, SETTINGS_LOAD}

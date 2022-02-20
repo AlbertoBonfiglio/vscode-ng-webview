@@ -4,13 +4,21 @@
 
 export const environment = {
   appName: 'ng-webview',
+  appTitle: 'Angular Webview Template',
   envName: 'DEV',
-  useRemotedev: true,
-  remotedevAddress: 'localhost',
-  remotedevPort: '8765',
-  useSecureRemotedev: false,
   production: false,
   i18nPrefix: '',
+  extension: {
+    appPath: 'dist',
+    extMediaFolder: 'js',
+    extMediaScript: 'ext.js',
+  },
+  remotedev: {
+    useRemotedev: true,
+    remotedevAddress: 'localhost',
+    remotedevPort: '8765',
+    useSecureRemotedev: false,
+  },
 };
 
 /*

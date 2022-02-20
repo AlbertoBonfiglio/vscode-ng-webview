@@ -6,7 +6,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { environment } from '../../environments/environment';
+import { environment as env} from 'environments/environment';
 
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { Store, StoreModule } from '@ngrx/store';
@@ -24,7 +24,7 @@ import { RemoteDevToolsProxy } from 'src/app/core/redux-devtools/redux-devtools.
 export function httpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
     http,
-    `${environment.i18nPrefix}/assets/i18n/`,
+    `${env.i18nPrefix}/assets/i18n/`,
     '.json'
   );
 }
@@ -37,14 +37,14 @@ SettingsActions };
 if (
   (!(<any>window).devToolsExtension &&
   !(<any>window).__REDUX_DEVTOOLS_EXTENSION__) ||
-  environment.useRemotedev
+  env.remotedev.useRemotedev
 ) {
 
   let remoteDevToolsProxy = new RemoteDevToolsProxy({
     connectTimeout: 300000, // extend for pauses during debugging
     ackTimeout: 120000, // extend for pauses during debugging
-    secure: environment.useSecureRemotedev, // dev only
-    instanceId: `${environment.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
+    secure: env.remotedev.useSecureRemotedev, // dev only
+    instanceId: `${env.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
   });
 
   // support both the legacy and new keys, for now
@@ -66,7 +66,7 @@ if (
     StoreModule.forFeature(SettingsFeature),
     EffectsModule.forRoot([SettingsEffects]),
     StoreDevtoolsModule.instrument({
-      name: `${environment.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
+      name: `${env.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
     }) /*
     environment.production
       ? []

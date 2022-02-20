@@ -8,7 +8,6 @@ import {
 } from '@ngrx/store';
 import { initStateFromVsCodeConfiguration } from 'src/app/core/meta-reducers/initStateFromVsCodeConfiguration.metareducer';
 import { RouterStateUrl } from 'src/app/core/router/router.state';
-import { environment } from '../../environments/environment';
 
 export interface AppState {
   router: RouterReducerState<RouterStateUrl>;
