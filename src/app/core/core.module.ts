@@ -18,8 +18,7 @@ import { VsCodeListenerService } from 'src/app/core/vs-code-listener/vs-code-lis
 import { SettingsActions, SettingsFeature } from 'src/app/core/settings/settings.slice';
 import { EffectsModule } from '@ngrx/effects';
 import { SettingsEffects } from 'src/app/core/settings/settings.effects';
-import { RemoteDevToolsProxy } from 'src/app/core/redux-devtools/redux-devtools.proxy';
-
+import { RemoteReduxDevtoolsModule } from 'src/app/core/redux-devtools/remote-redux-devtools.module';
 
 export function httpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(
@@ -32,26 +31,6 @@ export function httpLoaderFactory(http: HttpClient) {
 export { AppState, selectRouterState, NotificationService,
 SettingsActions };
 
-// Register our remote devtools if we're on-device and not
-// in a browser or if we want to use the remotedev tools
-if (
-  (!(<any>window).devToolsExtension &&
-  !(<any>window).__REDUX_DEVTOOLS_EXTENSION__) ||
-  env.remotedev.useRemotedev
-) {
-
-  let remoteDevToolsProxy = new RemoteDevToolsProxy({
-    connectTimeout: 300000, // extend for pauses during debugging
-    ackTimeout: 120000, // extend for pauses during debugging
-    secure: env.remotedev.useSecureRemotedev, // dev only
-    instanceId: `${env.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
-  });
-
-  // support both the legacy and new keys, for now
-  (<any>window).devToolsExtension = remoteDevToolsProxy;
-  (<any>window).__REDUX_DEVTOOLS_EXTENSION__ = remoteDevToolsProxy;
-}
-
 @NgModule({
   declarations: [],
   imports: [
@@ -61,19 +40,21 @@ if (
     FormsModule,
 
     // ngrx
+    RemoteReduxDevtoolsModule,
     StoreModule.forRoot(reducers, { metaReducers }),
     StoreRouterConnectingModule.forRoot(),
     StoreModule.forFeature(SettingsFeature),
     EffectsModule.forRoot([SettingsEffects]),
     StoreDevtoolsModule.instrument({
       name: `${env.appName.toUpperCase()}-REDUX-DEV-TOOLS`,
-    }) /*
+    })
+    /*
     environment.production
       ? []
       : StoreDevtoolsModule.instrument({
           name: `${environment.appName} Starter`,
         }),
-*/,
+    */,
 
     // 3rd party
     TranslateModule.forRoot({

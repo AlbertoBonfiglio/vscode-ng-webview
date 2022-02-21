@@ -1,3 +1,5 @@
+/// Work derived from https://gist.github.com/rob3c/c2c4dcc1116f94901ace179722c5f6d4
+
 import {
   ReduxDevtoolsExtension,
   ReduxDevtoolsExtensionConfig,
