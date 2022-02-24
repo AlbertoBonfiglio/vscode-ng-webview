@@ -3,12 +3,11 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { getWebviewOptions } from './extension';
 import  LocalStorageService  from './services/local-storage.service';
-import { IVsCodeMessage, IVSCodeSettings, SETTINGS_CHANGE, SETTINGS_LOAD } from './interfaces';
 import { environment as env } from './../environments/environment';
+import { IVSCodeSettings, IVsCodeMessage, SETTINGS_LOAD, SETTINGS_TRANSMIT_NEW } from './interfaces';
 
 export default class WebNgPanel {
   public static currentPanel: WebNgPanel | undefined;
-  private static readonly viewType = 'angular';
   private readonly panel: vscode.WebviewPanel;
   private readonly context?: vscode.ExtensionContext;
   private disposables: vscode.Disposable[] = [];
@@ -28,7 +27,7 @@ export default class WebNgPanel {
     }
 
     const panel = vscode.window.createWebviewPanel(
-      WebNgPanel.viewType,
+      env.extension.viewType,
       env.appTitle,
       column || vscode.ViewColumn.One,
       getWebviewOptions(context.extensionUri)
@@ -45,6 +44,7 @@ export default class WebNgPanel {
     this.panel = panel;
     // initializes te workspace storage (not used yet)
     this.storageManager = new LocalStorageService(context.workspaceState);
+
 
     // Set the webview's initial html content
     this.update();
@@ -76,12 +76,7 @@ export default class WebNgPanel {
 
   private handleOnDidReceiveMessage(): void {
     this.panel.webview.onDidReceiveMessage(
-      (message: IVsCodeMessage) => {
-        console.log(
-          '[WebNgPanel] received command:',
-          message.type,
-          message.payload
-        );
+       (message: IVsCodeMessage) => {
         // make sure it oly responds to ng-app sent messages
         if (message.source !== `NG-${env.appName}`) return;
 
@@ -98,17 +93,8 @@ export default class WebNgPanel {
           case SETTINGS_LOAD:
             WebNgPanel.sendMessage({
               type: SETTINGS_LOAD,
-              payload: this.configuration,
-              source: env.appTitle,
+              payload: this.configuration
             } as IVsCodeMessage);
-            break;
-
-          case SETTINGS_CHANGE:
-            //TODO verify this doesn't cause a loop
-            this.configuration.update(
-              message.payload.setting,
-              message.payload.value
-            );
             break;
 
           default:
@@ -129,13 +115,11 @@ export default class WebNgPanel {
           env.appName
         );
 
-        //TODO find out if changes triggered by the ng app cause this to fire
         for (let [key, value] of Object.entries(this.configuration)) {
           if (event.affectsConfiguration(`${env.appName}.${key}`)) {
             WebNgPanel.sendMessage({
-              type: 'configchange',
-              payload: { key, value },
-              source: env.appTitle,
+              type: SETTINGS_TRANSMIT_NEW,
+              payload: { key, value }
             } as IVsCodeMessage);
             break;
           }
@@ -159,13 +143,12 @@ export default class WebNgPanel {
   public static sendMessage(payload: IVsCodeMessage): void {
     const view = WebNgPanel.currentPanel?.panel?.webview;
     if (view) {
-      console.log('[WebNgPanel] sending message to app.', payload);
-      payload.source = `VSC-${payload.source}`;
+      payload.source = `${env.extension.prefix}-${env.appName}`;
       view.postMessage(payload);
     }
   }
 
-  // Returns the html vontent for the webview (the ng app)
+  // Returns the html content for the webview (the ng app)
   private getHtmlForWebview(): string {
     // path to dist folder
     const appDistPath = path.join(this.context!.extensionPath, env.extension.appPath);

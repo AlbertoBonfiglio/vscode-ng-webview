@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { createEffect, ofType, Actions } from "@ngrx/effects";
-import { IVsCodeMessage, SETTINGS_CHANGE } from "ext-src/interfaces";
-import { tap, combineLatest } from "rxjs";
+import { IVsCodeMessage, SETTINGS_LOAD } from "ext-src/interfaces";
+import { tap, combineLatest, map } from "rxjs";
 import { SettingsActions } from "src/app/core/core.module";
 import { VsCodeListenerService } from "src/app/core/vs-code-listener/vs-code-listener.service";
 
@@ -17,7 +17,7 @@ export class SettingsEffects {
       this.actions$.pipe(
         ofType(SettingsActions.loadStateFromVsCode),
         tap(() =>
-          this.vsCode.postMessage({ type: 'loadSettings' } as IVsCodeMessage)
+          this.vsCode.postMessage({ type: SETTINGS_LOAD } as IVsCodeMessage)
         )
       ),
     { dispatch: false }
@@ -34,7 +34,7 @@ export class SettingsEffects {
         tap(() => {
           const msg = {
             type: 'info',
-            payload: `Settings loaded`,
+            payload: 'Settings loaded',
           } as IVsCodeMessage;
           this.vsCode.postMessage(msg);
         })
@@ -42,19 +42,18 @@ export class SettingsEffects {
     { dispatch: false }
   );
 
-  readonly changeLanguage = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(SettingsActions.changeLanguage),
-        tap((value) =>{
-          const message = {
-            type: SETTINGS_CHANGE,
-            payload: value,
-          } as IVsCodeMessage;
-          console.log('value', value);
-          this.vsCode.postMessage(message);
-        })
-      ),
-    { dispatch: false }
+  readonly receiveSettingValue = createEffect(() =>
+    this.actions$.pipe(
+      ofType(SettingsActions.receiveSettingValue),
+      tap(() => console.log('receiveSettingValue')),
+      map((action) => {
+        const payload = {
+          key: action.payload.key,
+          value: action.payload.value,
+        };
+        return SettingsActions.changeSettingValueSuccess(payload);
+      })
+    )
   );
+
 }

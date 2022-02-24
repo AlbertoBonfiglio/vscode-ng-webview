@@ -1,8 +1,10 @@
-import { IVSCodeSettings } from 'ext-src/interfaces';
+import { IVsCodeMessage, IVSCodeSettings } from 'ext-src/interfaces';
+import * as _ from 'lodash';
 import { createSlice, PayloadAction } from 'ngrx-slice';
-import { SettingsState, NIGHT_MODE_THEME } from 'src/app/core/settings/settings.model';
+import { NIGHT_MODE_THEME } from 'src/app/core/settings/settings.model';
 
-export const initialState: SettingsState = {
+// Settings are used in the app but controlled edited in vscode
+export const initialState: IVSCodeSettings = {
   language: 'en',
   theme: 'DEFAULT-THEME',
   autoNightMode: false,
@@ -22,17 +24,28 @@ export const {
   name: 'settings',
   initialState,
   reducers: {
-    loadStateFromVsCode: (state) => {},
-    loadStateFromVsCodeSuccess: (state, action: PayloadAction<{payload: IVSCodeSettings}> ) => {
-      console.log('[reducer loadStateFromVsCodeSuccess]: ', action, state);
-      state = action. payload;
-      console.log('[reducer loadStateFromVsCodeSuccess]: ', action, state);
-
+    loadStateFromVsCode: () => {},
+    loadStateFromVsCodeSuccess: (
+      state: IVSCodeSettings,
+      action: PayloadAction<{ payload: IVSCodeSettings }>
+    ) => {
+      for (let [key, _] of Object.entries(state)) {
+        state[key] = action.payload[key];
+      }
     },
-    changeLanguage: (state, action: PayloadAction<{payload: string}> ) => {
-      state.language = action.payload;
+
+    receiveSettingValue: (
+      state: IVSCodeSettings,
+      action: PayloadAction<IVsCodeMessage>
+    ) => {},
+
+    changeSettingValueSuccess: (
+      state: IVSCodeSettings,
+      action: PayloadAction<{ key: string; value: any }>
+    ) => {
+      state[action.key] = action.value;
     },
   },
-  extraReducers: []
+  extraReducers: [],
 });
 

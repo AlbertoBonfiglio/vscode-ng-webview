@@ -4,10 +4,13 @@ export const environment = {
   envName: 'PROD',
   production: true,
   i18nPrefix: '',
+  messagePrefix: 'NG',
   extension: {
+    viewType: 'angular',
     appPath: 'dist',
     extMediaFolder: 'js',
     extMediaScript: 'ext.js',
+    prefix: 'VSC',
   },
   remotedev: {
     useRemotedev: true,

@@ -1,6 +1,6 @@
-import { IVsCodeMessage } from './interfaces';
 import * as vscode from 'vscode';
 import WebNgPanel from './ng-webview';
+import { IVsCodeMessage } from './interfaces';
 import { environment as env } from './../environments/environment';
 
 const START_COMMAND: string = 'ng-webview.start';

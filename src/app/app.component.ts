@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { environment } from 'environments/environment';
-import { SettingsActions } from 'src/app/core/core.module';
+import { environment as env } from 'environments/environment';
+import { IVsCodeMessage } from 'ext-src/interfaces';
+import { SettingsActions, SettingsSelectors } from 'src/app/core/core.module';
 import { AppState } from 'src/app/core/core.state';
 
 
@@ -11,14 +12,16 @@ import { AppState } from 'src/app/core/core.state';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent{
-  public title = environment.appName;
+  public title = env.appTitle;
+
+  readonly settings$ = this.store.select(SettingsSelectors.selectSettingsState);
 
   constructor(protected store: Store<AppState>) {
     console.clear;
   }
 
   buttonClick(): void {
-    this.store.dispatch(SettingsActions.changeLanguage({payload: 'de'}));
+
   }
 
 }

@@ -15,7 +15,7 @@ import { RouterStateSerializer, StoreRouterConnectingModule } from '@ngrx/router
 import { CustomSerializer } from 'src/app/core/router/custom-serializer';
 import { NotificationService } from 'src/app/core/notification/notification.service';
 import { VsCodeListenerService } from 'src/app/core/vs-code-listener/vs-code-listener.service';
-import { SettingsActions, SettingsFeature } from 'src/app/core/settings/settings.slice';
+import { SettingsActions, SettingsFeature, SettingsSelectors } from 'src/app/core/settings/settings.slice';
 import { EffectsModule } from '@ngrx/effects';
 import { SettingsEffects } from 'src/app/core/settings/settings.effects';
 import { RemoteReduxDevtoolsModule } from 'src/app/core/redux-devtools/remote-redux-devtools.module';
@@ -28,8 +28,13 @@ export function httpLoaderFactory(http: HttpClient) {
   );
 }
 
-export { AppState, selectRouterState, NotificationService,
-SettingsActions };
+export {
+  AppState,
+  selectRouterState,
+  NotificationService,
+  SettingsActions,
+  SettingsSelectors,
+};
 
 @NgModule({
   declarations: [],

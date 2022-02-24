@@ -327,6 +327,9 @@
 
 <div class="content" role="main">
 <button mat-raised-button color="accent" (click)="buttonClick()">Accent</button>
+  <div class="card highlight-card card-small">
+    {{(settings$|async)!.language}}
+  </div>
   <!-- Highlight Card -->
   <div class="card highlight-card card-small">
 

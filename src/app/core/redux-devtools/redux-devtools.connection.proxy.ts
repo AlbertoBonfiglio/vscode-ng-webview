@@ -12,6 +12,7 @@ export class RemoteDevToolsConnectionProxy
   }
   error(anyErr: any): void {
     //throw new Error('Method not implemented.');
+    console.log('RemoteDevTool Conn Proxy Error.',anyErr);
   }
 
   subscribe(listener: (change: any) => void): any {

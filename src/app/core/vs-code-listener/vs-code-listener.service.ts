@@ -2,7 +2,11 @@ import { Injectable, OnDestroy, Renderer2, RendererFactory2 } from '@angular/cor
 import { Store } from '@ngrx/store';
 import { Subject, Observable, fromEventPattern, takeUntil, filter, tap, map } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import { IVsCodeMessage, SETTINGS_LOAD } from 'ext-src/interfaces';
+import {
+  IVsCodeMessage,
+  SETTINGS_TRANSMIT_NEW,
+  SETTINGS_LOAD,
+} from 'ext-src/interfaces';
 import { SettingsActions } from 'src/app/core/core.module';
 import { AppState } from 'src/app/core/core.state';
 
@@ -32,13 +36,17 @@ export class VsCodeListenerService implements OnDestroy {
     this.initializeObservableStream();
   }
 
+  public init(): Promise<void> {
+    return new Promise<void>((resolve, reject) => resolve());
+  }
+
   private initializeObservableStream(): void {
     this.onMessage$
       .pipe(
         map((event) => (event as any).data as IVsCodeMessage),
         // only react to incoming messages from the vs code extension
         filter((msg: IVsCodeMessage) =>
-          msg ? msg.source === `VSC-${env.appTitle}` : false
+          msg ? msg.source === `${env.extension.prefix}-${env.appName}` : false
         ),
         tap((msg: IVsCodeMessage) => {
           switch (msg.type) {
@@ -48,6 +56,10 @@ export class VsCodeListenerService implements OnDestroy {
                   payload: msg.payload,
                 })
               );
+              break;
+
+            case SETTINGS_TRANSMIT_NEW:
+              this.store.dispatch(SettingsActions.receiveSettingValue(msg));
               break;
 
             default:
@@ -82,10 +94,6 @@ export class VsCodeListenerService implements OnDestroy {
       createOnMessageEventListener,
       () => removeOnMessageEventListener()
     ).pipe(takeUntil(this._destroy$));
-  }
-
-  public init(): Promise<void> {
-    return new Promise<void>((resolve, reject) => resolve());
   }
 
   public postMessage(payload: IVsCodeMessage): void {
