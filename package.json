@@ -45,18 +45,48 @@
       "properties": {
         "ng-webview.theme": {
           "type": "string",
-          "default": "default",
-          "description": "The selected theme for the UI."
+          "default": "system",
+          "description": "The selected theme for the UI.",
+          "enum": [
+            "system",
+            "darcula",
+            "broccoli"
+          ],
+          "enumDescriptions": [
+            "The system theme",
+            "A version of Darcula",
+            "An healthy theme full of fiber"
+          ]
         },
         "ng-webview.language": {
           "type": "string",
           "default": "en",
-          "description": "The selected language for the UI."
+          "description": "The selected language for the UI.",
+          "enum": [
+            "en",
+            "it",
+            "de"
+          ],
+          "enumDescriptions": [
+            "English (US)",
+            "Italiano",
+            "Deutsch"
+          ]
         },
         "ng-webview.nightTheme": {
           "type": "string",
           "default": "default",
-          "description": "The selected night theme for the UI."
+          "description": "The selected night theme for the UI.",
+          "enum": [
+            "system",
+            "darcula",
+            "broccoli"
+          ],
+          "enumDescriptions": [
+            "The system theme",
+            "A version of Darcula",
+            "An healthy theme full of fiber"
+          ]
         },
         "ng-webview.autoNightMode": {
           "type": "boolean",
@@ -84,9 +114,10 @@
           "description": "The selected language for the UI."
         },
         "ng-webview.hour": {
-          "type": "number",
-          "default": 17,
-          "description": "The selected language for the UI."
+          "type": "string",
+          "default": "17",
+          "format": "time",
+          "description": "The time at which the autonight starts. Should be in RFC3339 time format (hh:mm:ssZ)"
         }
       }
     }

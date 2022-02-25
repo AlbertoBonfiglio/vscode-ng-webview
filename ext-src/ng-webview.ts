@@ -4,7 +4,8 @@ import * as vscode from 'vscode';
 import { getWebviewOptions } from './extension';
 import  LocalStorageService  from './services/local-storage.service';
 import { environment as env } from './../environments/environment';
-import { IVSCodeSettings, IVsCodeMessage, SETTINGS_LOAD, SETTINGS_TRANSMIT_NEW } from './interfaces';
+import { IVSCodeSettings, IVsCodeMessage } from './interfaces';
+import { VSCMessages } from './enums';
 
 export default class WebNgPanel {
   public static currentPanel: WebNgPanel | undefined;
@@ -45,7 +46,6 @@ export default class WebNgPanel {
     // initializes te workspace storage (not used yet)
     this.storageManager = new LocalStorageService(context.workspaceState);
 
-
     // Set the webview's initial html content
     this.update();
 
@@ -70,8 +70,7 @@ export default class WebNgPanel {
     // This happens when the user closes the panel or when the panel is closed programatically
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
-    vscode.window.showInformationMessage(`${env.appTitle} Activated`);
-    console.log('[Config] :', this.configuration as unknown as IVSCodeSettings);
+    // vscode.window.showInformationMessage(`${env.appTitle} Activated`);
   }
 
   private handleOnDidReceiveMessage(): void {
@@ -80,19 +79,19 @@ export default class WebNgPanel {
         // make sure it oly responds to ng-app sent messages
         if (message.source !== `NG-${env.appName}`) return;
 
-        switch (message.type.toLowerCase()) {
-          case 'alert':
+        switch (message.type) {
+          case VSCMessages.alert:
             vscode.window.showErrorMessage(message.payload);
             break;
-          case 'info':
+          case VSCMessages.info:
             vscode.window.showInformationMessage(message.payload);
             break;
-          case 'warn':
+          case VSCMessages.warning:
             vscode.window.showWarningMessage(message.payload);
             break;
-          case SETTINGS_LOAD:
+          case VSCMessages.loadSettings:
             WebNgPanel.sendMessage({
-              type: SETTINGS_LOAD,
+              type: VSCMessages.loadSettingsComplete,
               payload: this.configuration
             } as IVsCodeMessage);
             break;
@@ -118,7 +117,7 @@ export default class WebNgPanel {
         for (let [key, value] of Object.entries(this.configuration)) {
           if (event.affectsConfiguration(`${env.appName}.${key}`)) {
             WebNgPanel.sendMessage({
-              type: SETTINGS_TRANSMIT_NEW,
+              type: VSCMessages.changedSetting,
               payload: { key, value }
             } as IVsCodeMessage);
             break;

@@ -2,13 +2,10 @@ import { Injectable, OnDestroy, Renderer2, RendererFactory2 } from '@angular/cor
 import { Store } from '@ngrx/store';
 import { Subject, Observable, fromEventPattern, takeUntil, filter, tap, map } from 'rxjs';
 import { environment as env } from 'environments/environment';
-import {
-  IVsCodeMessage,
-  SETTINGS_TRANSMIT_NEW,
-  SETTINGS_LOAD,
-} from 'ext-src/interfaces';
+import { IVsCodeMessage } from 'ext-src/interfaces';
 import { SettingsActions } from 'src/app/core/core.module';
 import { AppState } from 'src/app/core/core.state';
+import { VSCMessages } from 'ext-src/enums';
 
 const VSCODEAPI_NOT_FOUND = 'vsCodeApi not found on window object. Did you create the script in index.html?';
 
@@ -50,7 +47,7 @@ export class VsCodeListenerService implements OnDestroy {
         ),
         tap((msg: IVsCodeMessage) => {
           switch (msg.type) {
-            case SETTINGS_LOAD:
+            case VSCMessages.loadSettingsComplete:
               this.store.dispatch(
                 SettingsActions.loadStateFromVsCodeSuccess({
                   payload: msg.payload,
@@ -58,14 +55,18 @@ export class VsCodeListenerService implements OnDestroy {
               );
               break;
 
-            case SETTINGS_TRANSMIT_NEW:
-              this.store.dispatch(SettingsActions.receiveSettingValue(msg));
+            case VSCMessages.changedSetting:
+              this.store.dispatch(
+                SettingsActions.changeSettingValue(
+                  msg.payload
+                )
+              );
               break;
 
             default:
               // unknown message
               const unknownMessageWarning = {
-                type: 'warn',
+                type: VSCMessages.warning,
                 payload: `🐛 got an unknown message`,
               } as IVsCodeMessage;
               this.postMessage(unknownMessageWarning);

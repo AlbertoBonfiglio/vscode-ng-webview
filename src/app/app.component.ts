@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { environment as env } from 'environments/environment';
-import { IVsCodeMessage } from 'ext-src/interfaces';
-import { SettingsActions, SettingsSelectors } from 'src/app/core/core.module';
+import { SettingsSelectors } from 'src/app/core/core.module';
 import { AppState } from 'src/app/core/core.state';
 
 
@@ -17,7 +16,6 @@ export class AppComponent{
   readonly settings$ = this.store.select(SettingsSelectors.selectSettingsState);
 
   constructor(protected store: Store<AppState>) {
-    console.clear;
   }
 
   buttonClick(): void {

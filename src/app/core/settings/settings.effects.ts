@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { createEffect, ofType, Actions } from "@ngrx/effects";
-import { IVsCodeMessage, SETTINGS_LOAD } from "ext-src/interfaces";
-import { tap, combineLatest, map } from "rxjs";
+import { VSCMessages } from "ext-src/enums";
+import { IVsCodeMessage } from "ext-src/interfaces";
+import { combineLatest, map } from "rxjs";
 import { SettingsActions } from "src/app/core/core.module";
 import { VsCodeListenerService } from "src/app/core/vs-code-listener/vs-code-listener.service";
 
@@ -16,9 +17,10 @@ export class SettingsEffects {
     () =>
       this.actions$.pipe(
         ofType(SettingsActions.loadStateFromVsCode),
-        tap(() =>
-          this.vsCode.postMessage({ type: SETTINGS_LOAD } as IVsCodeMessage)
-        )
+        map(() =>
+          this.vsCode.postMessage(
+            { type: VSCMessages.loadSettings } as IVsCodeMessage
+          ))
       ),
     { dispatch: false }
   );
@@ -31,29 +33,15 @@ export class SettingsEffects {
         this.actions$.pipe(ofType(SettingsActions.loadStateFromVsCode)),
         this.actions$.pipe(ofType(SettingsActions.loadStateFromVsCodeSuccess)),
       ]).pipe(
-        tap(() => {
+        map(() => {
           const msg = {
-            type: 'info',
+            type: VSCMessages.info,
             payload: 'Settings loaded',
           } as IVsCodeMessage;
           this.vsCode.postMessage(msg);
         })
       ),
     { dispatch: false }
-  );
-
-  readonly receiveSettingValue = createEffect(() =>
-    this.actions$.pipe(
-      ofType(SettingsActions.receiveSettingValue),
-      tap(() => console.log('receiveSettingValue')),
-      map((action) => {
-        const payload = {
-          key: action.payload.key,
-          value: action.payload.value,
-        };
-        return SettingsActions.changeSettingValueSuccess(payload);
-      })
-    )
   );
 
 }

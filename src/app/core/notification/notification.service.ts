@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { VSCMessages } from 'ext-src/enums';
 import { IVsCodeMessage } from 'ext-src/interfaces';
 import { VsCodeListenerService } from 'src/app/core/vs-code-listener/vs-code-listener.service';
 
@@ -8,17 +9,16 @@ import { VsCodeListenerService } from 'src/app/core/vs-code-listener/vs-code-lis
 export class NotificationService {
   constructor(private vsCodeApi: VsCodeListenerService) {}
 
-  // todo add info, error, success, and default
   public warn(msg: string): void {
     this.vsCodeApi.postMessage({
-      type: 'alert',
+      type: VSCMessages.warning,
       payload: msg,
     } as IVsCodeMessage);
   }
 
   public alert(msg: string): void {
     this.vsCodeApi.postMessage({
-      type: 'warn',
+      type: VSCMessages.alert,
       payload: msg,
     } as IVsCodeMessage
     );
@@ -26,7 +26,7 @@ export class NotificationService {
 
   public info(msg: string): void {
     this.vsCodeApi.postMessage({
-      type: 'info',
+      type: VSCMessages.info,
       payload: msg,
     } as IVsCodeMessage);
   }

@@ -1,5 +1,4 @@
-import { IVsCodeMessage, IVSCodeSettings } from 'ext-src/interfaces';
-import * as _ from 'lodash';
+import { IVSCodeSettings } from 'ext-src/interfaces';
 import { createSlice, PayloadAction } from 'ngrx-slice';
 import { NIGHT_MODE_THEME } from 'src/app/core/settings/settings.model';
 
@@ -29,17 +28,12 @@ export const {
       state: IVSCodeSettings,
       action: PayloadAction<{ payload: IVSCodeSettings }>
     ) => {
-      for (let [key, _] of Object.entries(state)) {
+      for (let [key, value] of Object.entries(state)) {
         state[key] = action.payload[key];
       }
     },
 
-    receiveSettingValue: (
-      state: IVSCodeSettings,
-      action: PayloadAction<IVsCodeMessage>
-    ) => {},
-
-    changeSettingValueSuccess: (
+    changeSettingValue: (
       state: IVSCodeSettings,
       action: PayloadAction<{ key: string; value: any }>
     ) => {
